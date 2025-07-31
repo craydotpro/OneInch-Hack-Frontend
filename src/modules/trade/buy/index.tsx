@@ -2,52 +2,95 @@ import { TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
-
-const Buy = () => {
-  const TOTAL_BALANCE = 120;
+import { Button } from "../../../components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import tradeService from "../../../services/trade";
+import { useAccount } from "wagmi";
+import { toast } from "sonner";
+import { readableError } from "../../../lib/utils";
+import { ORDER_TYPES } from "../../../constants";
+const Buy = ({ aggregatedBalance, token, orderType }: any) => {
+  const { address } = useAccount();
+  const TOTAL_BALANCE = aggregatedBalance || 0;
   const [size, setSize] = useState<number>();
+  const [triggerPrice, setTriggerPrice] = useState<number>();
   const handleSliderChange = (value: number | number[]) => {
     if (!Array.isArray(value)) value = [value];
     setSize((TOTAL_BALANCE * value[0]) / 100);
   };
+  const buyMutation = useMutation({
+    mutationFn: () =>
+      tradeService.Buy({
+        userAddress: address,
+        toToken: token,
+        type: orderType,
+        amountInUSD: String(size),
+        ...(orderType === ORDER_TYPES.limit && {
+          triggerPrice,
+        }),
+      }),
+    onError: (error: any) => {
+      toast(readableError(error));
+    },
+  });
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    buyMutation.mutate();
+  };
   return (
-    <TabsContent value="buy" className="flex flex-col gap-4">
-      total Balance {TOTAL_BALANCE}$
-      <Input
-        type="number"
-        label="size"
-        id="size"
-        placeholder="Size"
-        onChange={(e: any) => setSize(Number(e.target.value))}
-        value={size}
-        max={TOTAL_BALANCE}
-        min={0}
-      />
-      <div className="flex gap-4">
-        <Slider
-          onValueChange={handleSliderChange}
-          value={[(100 / TOTAL_BALANCE) * size!]}
-          defaultValue={[33]}
-          max={100}
-          step={1}
-        />
-        <div className="relative">
+    <form onSubmit={handleSubmit} className="h-full">
+      <TabsContent value="buy" className="flex flex-col gap-4 h-full">
+        <div className="flex-grow h-full flex flex-col gap-4">
           <Input
-            type="number"
+            type="text"
+            label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
             id="size"
             placeholder="Size"
-            onChange={(e: any) => handleSliderChange(Number(e.target.value))}
-            value={((100 / TOTAL_BALANCE) * size!).toFixed(2)}
-            max={TOTAL_BALANCE}
-            min={0}
-            className="w-22 after:absolute "
+            onChange={(e: any) => setSize(e.target.value)}
+            value={size?.toFixed?.(2)}
           />
-          <span className="absolute top-1/2 -translate-1/2 right-1 text-gray-500">
-            %
-          </span>
+          {orderType === ORDER_TYPES.limit ? (
+            <Input
+              type="text"
+              label={`Trigger Price (USDC)`}
+              id="size"
+              placeholder="Trigger Price"
+              onChange={(e: any) => setTriggerPrice(e.target.value)}
+              value={triggerPrice?.toFixed?.(2)}
+            />
+          ) : null}
+          <div className="flex gap-4">
+            <Slider
+              onValueChange={handleSliderChange}
+              value={[(100 / TOTAL_BALANCE) * size!]}
+              defaultValue={[33]}
+              max={100}
+              step={1}
+              min={0}
+            />
+            <div className="relative">
+              <Input
+                id="size"
+                placeholder="0"
+                onChange={(e: any) =>
+                  handleSliderChange(Number(e.target.value))
+                }
+                value={size ? ((100 / TOTAL_BALANCE) * size!).toFixed(0) : ""}
+                max={TOTAL_BALANCE}
+                min={0}
+                className="w-22 after:absolute "
+              />
+              <span className="absolute top-1/2 -translate-1/2 right-1 text-gray-500">
+                %
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    </TabsContent>
+        <Button type="submit" isLoading={buyMutation.isPending}>
+          Buy
+        </Button>
+      </TabsContent>
+    </form>
   );
 };
 export default Buy;
