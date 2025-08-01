@@ -5,7 +5,20 @@ const signPaymentData = async ({ crayOrder, allowanceData, limitOrderTypedData, 
   const walletClient = await getWalletClient();
   const signedOrder = crayOrder && await walletClient.signTypedData(crayOrder);
   const signedLimitOrder = limitOrderTypedData && await walletClient.signTypedData(limitOrderTypedData);
-  const signedSltpOrder = sltpOrderTypedData && await walletClient.signTypedData(sltpOrderTypedData);
+  const signedSltpOrder = sltpOrderTypedData
+    ? await Promise.all(
+        Array.from(sltpOrderTypedData).map(async (data) => {
+          const entries = await Promise.all(
+            Object.entries(data).map(async ([key, value]) => {
+              const signature = await walletClient.signTypedData(value);
+              return [key, signature];
+            })
+          );
+          return Object.fromEntries(entries);
+        })
+      )
+    : undefined;
+ 
   const signedApprovalData = [];
   for (let i = 0; i < allowanceData?.length; i++) {
     const data = allowanceData[i];
