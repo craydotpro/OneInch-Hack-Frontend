@@ -25,7 +25,7 @@ class TradeService {
       ), //[{ chainId: ChainId.BASE_CHAIN_ID, data: signedOrder }],
       signedApprovalData,
       signedLimitOrder: signedLimitOrder && [{ data: signedLimitOrder }],
-      signedSltpOrder: signedSltpOrder && [{ data: signedSltpOrder }],
+      signedSltpOrder,
     };
     const result = await API.post(`submit/${positionId}`, body1);
     return result;

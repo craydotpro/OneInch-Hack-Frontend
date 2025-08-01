@@ -18,6 +18,8 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
     if (!Array.isArray(value)) value = [value];
     setSize((TOTAL_BALANCE * value[0]) / 100);
   };
+  const slTriggerPrice = 1211; // @ahmad: todo
+  const tpTriggerPrice = 3511;
   const buyMutation = useMutation({
     mutationFn: () =>
       tradeService.Buy({
@@ -26,13 +28,17 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
         type: orderType,
         amountInUSD: String(size),
         ...(orderType === ORDER_TYPES.limit && {
-          triggerPrice,
+          triggerPrice
         }),
+        advanceSLTP: {
+          sl: { price: slTriggerPrice },
+          tp: { price: tpTriggerPrice }
+        }
       }),
     onError: (error: any) => {
-      toast(readableError(error));
-    },
-  });
+      toast(readableError(error))
+    }
+  })
   const handleSubmit = (e: any) => {
     e.preventDefault();
     buyMutation.mutate();
