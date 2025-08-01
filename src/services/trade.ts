@@ -2,27 +2,30 @@ import { API } from "../constants";
 import signPaymentData from "../lib/sign_data";
 
 class TradeService {
-  Buy = async (data: Record<string, any>) => {
+  Trade = async (type: "buy" | "sell", data: Record<string, any>) => {
     const {
       data: { result: payload },
-    } = await API.post(`prepare-buy`, data);
+    } = await API.post(`prepare-${type}`, data);
 
-    const { signedApprovalData, signedOrder, signedLimitOrder, signedSltpOrder } = await signPaymentData(
-      {
-        crayOrder: payload?.typedOrder,
-        allowanceData: payload?.allowance,
-        limitOrderTypedData: payload?.limitOrderTypedData,
-        sltpOrderTypedData: payload?.sltpOrderTypedData,
-      }
-    );
+    const {
+      signedApprovalData,
+      signedOrder,
+      signedLimitOrder,
+      signedSltpOrder,
+    } = await signPaymentData({
+      crayOrder: payload?.typedOrder,
+      allowanceData: payload?.allowance,
+      limitOrderTypedData: payload?.limitOrderTypedData,
+      sltpOrderTypedData: payload?.sltpOrderTypedData,
+    });
     const { positionId, typedOrder } = payload;
     const body1 = {
-      signedOrder: typedOrder && typedOrder?.message.inputs.map(
-        ({ chainId }: { chainId: number }) => ({
+      signedOrder:
+        typedOrder &&
+        typedOrder?.message.inputs.map(({ chainId }: { chainId: number }) => ({
           chainId: chainId,
           data: signedOrder,
-        })
-      ), //[{ chainId: ChainId.BASE_CHAIN_ID, data: signedOrder }],
+        })), //[{ chainId: ChainId.BASE_CHAIN_ID, data: signedOrder }],
       signedApprovalData,
       signedLimitOrder: signedLimitOrder && [{ data: signedLimitOrder }],
       signedSltpOrder,

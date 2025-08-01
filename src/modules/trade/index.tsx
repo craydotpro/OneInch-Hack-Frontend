@@ -1,6 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Buy from "./buy";
-import Sell from "./sell";
 import {
   Select,
   SelectContent,
@@ -14,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import balanceService from "../../services/balance";
 import { useState } from "react";
 import { ORDER_TYPES, TOKENS } from "../../constants";
+import TradeForm from "./form";
 const TradeHome = () => {
   const [orderType, setOrderType] = useState(() => ORDER_TYPES.market);
   const [token, setToken] = useState(TOKENS[0]);
@@ -64,8 +63,18 @@ const TradeHome = () => {
           )}
         </div>
         <div className="mt-2 flex-grow">
-          <Buy {...balance.data} token={token} orderType={orderType} />
-          <Sell />
+          <TradeForm
+            type="buy"
+            {...balance.data}
+            token={token}
+            orderType={orderType}
+          />
+          <TradeForm
+            type="sell"
+            {...balance.data}
+            token={token}
+            orderType={orderType}
+          />
         </div>
       </Tabs>
     </div>
