@@ -1,14 +1,14 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { TabsContent } from "@/components/ui/tabs";
+import { ORDER_TYPES } from "@/constants";
+import { readableError } from "@/lib/utils";
+import tradeService from "@/services/trade";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { ORDER_TYPES } from "@/constants";
-import { readableError } from "@/lib/utils";
-import tradeService from "@/services/trade";
 const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
   const { address } = useAccount();
   const TOTAL_BALANCE = aggregatedBalance || 0;
@@ -24,25 +24,29 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
     mutationFn: () =>
       tradeService.Trade(type, {
         userAddress: address,
-        ...(type==='buy'?{
-          toToken: token,
-        }:{
-          sellingToken: token,
-        }),
+        ...(type === 'buy'
+          ? {
+              toToken: token,
+              amountInUSD: String(size)
+            }
+          : {
+              sellingToken: token,
+              amountInToken: String(size)
+            }),
         type: orderType,
         amountInUSD: String(size),
         ...(orderType === ORDER_TYPES.limit && {
-          triggerPrice,
+          triggerPrice
         }),
         advanceSLTP: {
           sl: { price: slTriggerPrice },
-          tp: { price: tpTriggerPrice },
-        },
+          tp: { price: tpTriggerPrice }
+        }
       }),
     onError: (error: any) => {
-      toast(readableError(error));
-    },
-  });
+      toast(readableError(error))
+    }
+  })
 
   return (
     <TabsContent value={type} className="flex flex-col gap-4 h-full">

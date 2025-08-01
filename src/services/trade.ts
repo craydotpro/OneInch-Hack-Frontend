@@ -12,11 +12,13 @@ class TradeService {
       signedOrder,
       signedLimitOrder,
       signedSltpOrder,
+      signedSellOrder,
     } = await signPaymentData({
       crayOrder: payload?.typedOrder,
       allowanceData: payload?.allowance,
       limitOrderTypedData: payload?.limitOrderTypedData,
       sltpOrderTypedData: payload?.sltpOrderTypedData,
+      sellTypedData: payload?.sellTypedData,
     });
     const { positionId, typedOrder } = payload;
     const body1 = {
@@ -29,6 +31,7 @@ class TradeService {
       signedApprovalData,
       signedLimitOrder: signedLimitOrder && [{ data: signedLimitOrder }],
       signedSltpOrder,
+      signedSellOrder: signedSellOrder && [{ data: signedSellOrder }],
     };
     const result = await API.post(`submit/${positionId}`, body1);
     return result;
