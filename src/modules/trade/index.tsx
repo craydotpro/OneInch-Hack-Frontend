@@ -20,7 +20,7 @@ const TradeHome = () => {
   const { address } = useAccount();
   const balance = useQuery({
     queryKey: ["balance", address],
-    queryFn: () => balanceService.GetAll(address!),
+    queryFn: () => balanceService.GetAll(address!, "STABLE_COINS"),
     enabled: !!address,
   });
   return (
