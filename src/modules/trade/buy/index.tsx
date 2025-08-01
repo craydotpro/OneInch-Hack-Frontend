@@ -1,14 +1,14 @@
-import { TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
-import { Button } from "../../../components/ui/button";
+import { TabsContent } from "@/components/ui/tabs";
 import { useMutation } from "@tanstack/react-query";
-import tradeService from "../../../services/trade";
-import { useAccount } from "wagmi";
+import { useState } from "react";
 import { toast } from "sonner";
-import { readableError } from "../../../lib/utils";
+import { useAccount } from "wagmi";
+import { Button } from "../../../components/ui/button";
 import { ORDER_TYPES } from "../../../constants";
+import { readableError } from "../../../lib/utils";
+import tradeService from "../../../services/trade";
 const Buy = ({ aggregatedBalance, token, orderType }: any) => {
   const { address } = useAccount();
   const TOTAL_BALANCE = aggregatedBalance || 0;
@@ -41,14 +41,6 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
     <form onSubmit={handleSubmit} className="h-full">
       <TabsContent value="buy" className="flex flex-col gap-4 h-full">
         <div className="flex-grow h-full flex flex-col gap-4">
-          <Input
-            type="text"
-            label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
-            id="size"
-            placeholder="Size"
-            onChange={(e: any) => setSize(e.target.value)}
-            value={size?.toFixed?.(2)}
-          />
           {orderType === ORDER_TYPES.limit ? (
             <Input
               type="text"
@@ -59,6 +51,14 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
               value={triggerPrice?.toFixed?.(2)}
             />
           ) : null}
+          <Input
+            type="text"
+            label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
+            id="size"
+            placeholder="Size"
+            onChange={(e: any) => setSize(e.target.value)}
+            value={size?.toFixed?.(2)}
+          />
           <div className="flex gap-4">
             <Slider
               onValueChange={handleSliderChange}
@@ -75,7 +75,7 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
                 onChange={(e: any) =>
                   handleSliderChange(Number(e.target.value))
                 }
-                value={size ? ((100 / TOTAL_BALANCE) * size!).toFixed(0) : ""}
+                value={size ? ((100 / TOTAL_BALANCE) * size!).toFixed(0) : ''}
                 max={TOTAL_BALANCE}
                 min={0}
                 className="w-22 after:absolute "
@@ -91,6 +91,6 @@ const Buy = ({ aggregatedBalance, token, orderType }: any) => {
         </Button>
       </TabsContent>
     </form>
-  );
+  )
 };
 export default Buy;
