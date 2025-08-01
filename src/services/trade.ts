@@ -3,23 +3,29 @@ import signPaymentData from "../lib/sign_data";
 
 class TradeService {
   Buy = async (data: Record<string, any>) => {
-    let {
+    const {
       data: { result: payload },
     } = await API.post(`prepare-buy`, data);
 
-    const { signedApprovalData, signedOrder } = await signPaymentData(
-      payload.typedOrder,
-      payload.allowance
+    const { signedApprovalData, signedOrder, signedLimitOrder, signedSltpOrder } = await signPaymentData(
+      {
+        crayOrder: payload?.typedOrder,
+        allowanceData: payload?.allowance,
+        limitOrderTypedData: payload?.limitOrderTypedData,
+        sltpOrderTypedData: payload?.sltpOrderTypedData,
+      }
     );
     const { positionId, typedOrder } = payload;
     const body1 = {
-      signedOrder: typedOrder.message.inputs.map(
+      signedOrder: typedOrder && typedOrder?.message.inputs.map(
         ({ chainId }: { chainId: number }) => ({
           chainId: chainId,
           data: signedOrder,
         })
       ), //[{ chainId: ChainId.BASE_CHAIN_ID, data: signedOrder }],
       signedApprovalData,
+      signedLimitOrder: signedLimitOrder && [{ data: signedLimitOrder }],
+      signedSltpOrder: signedSltpOrder && [{ data: signedSltpOrder }],
     };
     const result = await API.post(`submit/${positionId}`, body1);
     return result;

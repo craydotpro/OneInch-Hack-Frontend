@@ -1,9 +1,11 @@
 import { CHAINS } from "../constants";
 import { getWalletClient } from "./viem";
 
-const signPaymentData = async (crayOrder: any, allowanceData = [] as any[]) => {
+const signPaymentData = async ({ crayOrder, allowanceData, limitOrderTypedData, sltpOrderTypedData }) => {
   const walletClient = await getWalletClient();
-  const signedOrder = await walletClient.signTypedData(crayOrder);
+  const signedOrder = crayOrder && await walletClient.signTypedData(crayOrder);
+  const signedLimitOrder = limitOrderTypedData && await walletClient.signTypedData(limitOrderTypedData);
+  const signedSltpOrder = sltpOrderTypedData && await walletClient.signTypedData(sltpOrderTypedData);
   const signedApprovalData = [];
   for (let i = 0; i < allowanceData?.length; i++) {
     const data = allowanceData[i];
@@ -27,6 +29,6 @@ const signPaymentData = async (crayOrder: any, allowanceData = [] as any[]) => {
     });
   }
 
-  return { signedOrder, signedApprovalData };
+  return { signedOrder, signedApprovalData, signedLimitOrder, signedSltpOrder };
 };
 export default signPaymentData;
