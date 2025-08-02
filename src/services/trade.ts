@@ -15,7 +15,7 @@ class TradeService {
       signedSellOrder,
     } = await signPaymentData({
       crayOrder: payload?.typedOrder,
-      allowanceData: payload?.allowance,
+      allowanceData: payload?.approvalTypedData,
       limitOrderTypedData: payload?.limitOrderTypedData,
       sltpOrderTypedData: payload?.sltpOrderTypedData,
       sellTypedData: payload?.sellTypedData,
