@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
+import TradeHistory from "./history";
 const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
   const { address } = useAccount();
   const TOTAL_BALANCE = aggregatedBalance || 0;
@@ -50,48 +51,46 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
 
   return (
     <TabsContent value={type} className="flex flex-col gap-4 h-full">
-      <div className="flex-grow h-full flex flex-col gap-4">
-        {orderType === ORDER_TYPES.limit ? (
-          <Input
-            type="text"
-            label={`Trigger Price (USDC)`}
-            id="size"
-            placeholder="Trigger Price"
-            onChange={(e: any) => setTriggerPrice(e.target.value)}
-            value={triggerPrice?.toFixed?.(2)}
-          />
-        ) : null}
+      {orderType === ORDER_TYPES.limit ? (
         <Input
           type="text"
-          label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
+          label={`Trigger Price (USDC)`}
           id="size"
-          placeholder="Size"
-          onChange={(e: any) => setSize(e.target.value)}
-          value={size?.toFixed?.(2)}
+          placeholder="Trigger Price"
+          onChange={(e: any) => setTriggerPrice(e.target.value)}
+          value={triggerPrice?.toFixed?.(2)}
         />
-        <div className="flex gap-4">
-          <Slider
-            onValueChange={handleSliderChange}
-            value={[(100 / TOTAL_BALANCE) * size!]}
-            defaultValue={[33]}
-            max={100}
-            step={1}
+      ) : null}
+      <Input
+        type="text"
+        label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
+        id="size"
+        placeholder="Size"
+        onChange={(e: any) => setSize(e.target.value)}
+        value={size?.toFixed?.(2)}
+      />
+      <div className="flex gap-4">
+        <Slider
+          onValueChange={handleSliderChange}
+          value={[(100 / TOTAL_BALANCE) * size!]}
+          defaultValue={[33]}
+          max={100}
+          step={1}
+          min={0}
+        />
+        <div className="relative">
+          <Input
+            id="size"
+            placeholder="0"
+            onChange={(e: any) => handleSliderChange(Number(e.target.value))}
+            value={size ? ((100 / TOTAL_BALANCE) * size!).toFixed(0) : ""}
+            max={TOTAL_BALANCE}
             min={0}
+            className="w-22 after:absolute "
           />
-          <div className="relative">
-            <Input
-              id="size"
-              placeholder="0"
-              onChange={(e: any) => handleSliderChange(Number(e.target.value))}
-              value={size ? ((100 / TOTAL_BALANCE) * size!).toFixed(0) : ""}
-              max={TOTAL_BALANCE}
-              min={0}
-              className="w-22 after:absolute "
-            />
-            <span className="absolute top-1/2 -translate-1/2 right-1 text-gray-500">
-              %
-            </span>
-          </div>
+          <span className="absolute top-1/2 -translate-1/2 right-1 text-gray-500">
+            %
+          </span>
         </div>
       </div>
       <Button
@@ -101,6 +100,7 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
       >
         {type}
       </Button>
+      <TradeHistory />
     </TabsContent>
   );
 };
