@@ -33,7 +33,7 @@ const TradeForm = ({ token, orderType, type }: any) => {
     }else{
       const currentToken = tradeTokenBalances.data?.balances.find((_:any)=>_.token===token)
       if(!currentToken) return 0
-      return Number(formatEther(BigInt(currentToken.balance), currentToken.decimals))
+      return Number(formatEther(BigInt(currentToken.balance)))
     }
   },[type, tradeTokenBalances.data, usdcBalance.data, token])
   const [sltp, setSLTP] = useState({
@@ -70,15 +70,20 @@ const TradeForm = ({ token, orderType, type }: any) => {
           tp: { price: sltp.tpTriggerPrice },
         },
       }),
-      onSuccess:(res)=>{
-        console.log(res)
+      onSuccess:()=>{
         queryClient.invalidateQueries({
           queryKey: ["balance", address]
         })
         queryClient.invalidateQueries({
           queryKey: ["portfolio", address]
         })
-        toast("Success")
+        queryClient.invalidateQueries({
+          queryKey: ["open_orders", address],
+        })
+         queryClient.invalidateQueries({
+          queryKey: ["histories", address],
+        })
+        toast("Position submitted successfully")
       },
     onError: (error: any) => {
       toast(readableError(error))
@@ -89,7 +94,7 @@ const TradeForm = ({ token, orderType, type }: any) => {
     if(type==='buy'){
       return `Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`
     }else{
-      return `Available to Trade: ${TOTAL_BALANCE?.toFixed(3)}`
+      return `Available to Trade: ${TOTAL_BALANCE?.toFixed(10)}`
     }
   },[TOTAL_BALANCE])
   return (
