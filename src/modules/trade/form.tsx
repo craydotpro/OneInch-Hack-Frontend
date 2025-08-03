@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import TradeHistory from "./history";
+import { queryClient } from "../../constants";
 const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
   const { address } = useAccount();
   const TOTAL_BALANCE = aggregatedBalance || 0;
@@ -44,6 +45,16 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
           tp: { price: tpTriggerPrice }
         }
       }),
+      onSuccess:(res)=>{
+        console.log(res)
+        queryClient.invalidateQueries({
+          queryKey: ["balance", address]
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["portfolio", address]
+        })
+        toast("Success")
+      },
     onError: (error: any) => {
       toast(readableError(error))
     }
