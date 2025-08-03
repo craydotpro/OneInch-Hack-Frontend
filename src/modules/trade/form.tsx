@@ -11,17 +11,21 @@ import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import TradeHistory from "./history";
 import { queryClient } from "../../constants";
+import SLTP from "./sltp";
 const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
   const { address } = useAccount();
   const TOTAL_BALANCE = aggregatedBalance || 0;
+  const [sltp, setSLTP] = useState({
+    isActive: false,
+    slTriggerPrice: 0,
+    tpTriggerPrice: 0,
+  });
   const [size, setSize] = useState<number>();
   const [triggerPrice, setTriggerPrice] = useState<number>();
   const handleSliderChange = (value: number | number[]) => {
     if (!Array.isArray(value)) value = [value];
     setSize((TOTAL_BALANCE * value[0]) / 100);
   };
-  const slTriggerPrice = 1211; // @ahmad: todo
-  const tpTriggerPrice = 3511;
   const tradeMutation = useMutation({
     mutationFn: () =>
       tradeService.Trade(type, {
@@ -41,9 +45,9 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
           triggerPrice
         }),
         advanceSLTP: {
-          sl: { price: slTriggerPrice },
-          tp: { price: tpTriggerPrice }
-        }
+          sl: { price: sltp.slTriggerPrice },
+          tp: { price: sltp.tpTriggerPrice },
+        },
       }),
       onSuccess:(res)=>{
         console.log(res)
@@ -104,6 +108,7 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
           </span>
         </div>
       </div>
+      <SLTP sltp={sltp} setSLTP={setSLTP} />
       <Button
         onClick={() => tradeMutation.mutate()}
         isLoading={tradeMutation.isPending}

@@ -22,7 +22,7 @@ const TradeHistory = () => {
           </button>
         ))}
       </div>
-      <div className="flex flex-col h-36 overflow-scroll">
+      <div className="flex flex-col h-24 overflow-scroll">
         {historyType === "OPEN_ORDER" ? <OpenOrders /> : <Histories />}
       </div>
     </div>
