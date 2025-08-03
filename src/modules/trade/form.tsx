@@ -5,16 +5,37 @@ import { TabsContent } from "@/components/ui/tabs";
 import { ORDER_TYPES } from "@/constants";
 import { readableError } from "@/lib/utils";
 import tradeService from "@/services/trade";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import TradeHistory from "./history";
 import { queryClient } from "../../constants";
 import SLTP from "./sltp";
-const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
+import balanceService from "../../services/balance";
+import { formatEther } from "viem";
+const TradeForm = ({ token, orderType, type }: any) => {
   const { address } = useAccount();
-  const TOTAL_BALANCE = aggregatedBalance || 0;
+  const usdcBalance = useQuery({
+    queryKey: ["balance", address],
+    queryFn: () => balanceService.GetAll(address!, "STABLE_COINS"),
+    enabled: !!address,
+  });
+   const tradeTokenBalances = useQuery({
+    queryKey: ["portfolio", address],
+    queryFn: () => balanceService.GetAll(address!, "TRADING_COINS"),
+    enabled: !!address,
+  });
+  const TOTAL_BALANCE = useMemo(()=>{
+    if(! tradeTokenBalances.data||!usdcBalance.data) return 0
+    if(type==='buy'){
+      return usdcBalance.data?.aggregatedBalance
+    }else{
+      const currentToken = tradeTokenBalances.data?.balances.find((_:any)=>_.token===token)
+      if(!currentToken) return 0
+      return Number(formatEther(BigInt(currentToken.balance), currentToken.decimals))
+    }
+  },[type, tradeTokenBalances.data, usdcBalance.data, token])
   const [sltp, setSLTP] = useState({
     isActive: false,
     slTriggerPrice: 0,
@@ -64,6 +85,13 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
     }
   })
 
+  const availableToTrade = useMemo(()=>{
+    if(type==='buy'){
+      return `Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`
+    }else{
+      return `Available to Trade: ${TOTAL_BALANCE?.toFixed(3)}`
+    }
+  },[TOTAL_BALANCE])
   return (
     <TabsContent value={type} className="flex flex-col gap-4 h-full">
       {orderType === ORDER_TYPES.limit ? (
@@ -78,7 +106,7 @@ const TradeForm = ({ aggregatedBalance, token, orderType, type }: any) => {
       ) : null}
       <Input
         type="text"
-        label={`Available to Trade: $${TOTAL_BALANCE?.toFixed(3)}`}
+        label={availableToTrade}
         id="size"
         placeholder="Size"
         onChange={(e: any) => setSize(e.target.value)}
