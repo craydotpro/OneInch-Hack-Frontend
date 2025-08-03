@@ -13,7 +13,7 @@ const SLTP = ({ sltp, setSLTP }: any) => {
             setSLTP((state: any) => ({ ...state, isActive: !state.isActive }))
           }
         />{" "}
-        SLTP
+        SL/TP
       </Label>
       <div
         className={`flex items-center justify-center gap-4 ${
