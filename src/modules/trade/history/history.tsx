@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 
 const TradeHistory = () => {
   const { address } = useAccount();
-  const openOrders = useQuery({
+  const histories = useQuery({
     queryKey: ["histories", address],
     queryFn: () => insightService.GetTradeHistory(address!),
     enabled: !!address,
@@ -17,7 +17,7 @@ const TradeHistory = () => {
         <div>Quantity</div>
         <div>Amount</div>
       </div>
-      {openOrders.data?.map((data: any) => (
+      {histories.data?.map((data: any) => (
         <div className="grid grid-cols-4 font-bold text-xs py-2 text-center text-gray-500">
           <div>{data.side}</div>
           <div>{data.token || "-"}</div>

@@ -9,7 +9,7 @@ const HISTORY_TYPES = {
 const TradeHistory = () => {
   const [historyType, setHistoryType] = useState("OPEN_ORDER");
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       <div className="flex border-b">
         {Object.keys(HISTORY_TYPES).map((type) => (
           <button
@@ -22,7 +22,7 @@ const TradeHistory = () => {
           </button>
         ))}
       </div>
-      <div className="flex flex-col h-24 overflow-scroll">
+      <div className="flex flex-col overflow-scroll">
         {historyType === "OPEN_ORDER" ? <OpenOrders /> : <Histories />}
       </div>
     </div>
