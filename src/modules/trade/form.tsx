@@ -14,6 +14,7 @@ import { queryClient } from "../../constants";
 import SLTP from "./sltp";
 import balanceService from "../../services/balance";
 import { formatEther } from "viem";
+import { popup } from "../../lib/popup_handler";
 const TradeForm = ({ token, orderType, type }: any) => {
   const { address } = useAccount();
   const usdcBalance = useQuery({
@@ -70,7 +71,8 @@ const TradeForm = ({ token, orderType, type }: any) => {
           tp: { price: sltp.tpTriggerPrice },
         },
       }),
-      onSuccess:()=>{
+      onSuccess:(res:any)=>{
+        popup.open("success",res.data);
         queryClient.invalidateQueries({
           queryKey: ["balance", address]
         })
@@ -98,7 +100,7 @@ const TradeForm = ({ token, orderType, type }: any) => {
     }
   },[TOTAL_BALANCE])
   return (
-    <TabsContent value={type} className="flex flex-col gap-4 h-full">
+    <TabsContent value={type} className="flex flex-col gap-4 flex-grow">
       {orderType === ORDER_TYPES.limit ? (
         <Input
           type="text"
