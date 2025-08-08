@@ -2,11 +2,9 @@ import { createAppKit } from "@reown/appkit/react";
 
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { arbitrum, base } from "@reown/appkit/networks";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 
 // 0. Setup queryClient
-const queryClient = new QueryClient();
 
 // 1. Get projectId from https://dashboard.reown.com
 const projectId = import.meta.env.VITE_APP_KIT_PROJECT_ID;
@@ -43,7 +41,7 @@ createAppKit({
 export function AppKitProvider({ children }) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      {children}
     </WagmiProvider>
   );
 }
