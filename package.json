@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "popup_handler": "node app_router/index.js",
+    "dev": "npm run popup_handler | vite --host",
+    "build": "npm run popup_handler build | tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -28,6 +29,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^6.3.0",
+    "react-transition-group": "^4.4.5",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
@@ -47,6 +49,7 @@
     "tw-animate-css": "^1.3.6",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vite-plugin-require": "^1.2.14"
   }
 }

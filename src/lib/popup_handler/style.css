@@ -1,0 +1,51 @@
+@keyframes blurout {
+  from {
+    backdrop-filter: blur(0);
+  }
+  to {
+    backdrop-filter: blur(20px);
+  }
+}
+.modal-component > div:nth-child(2) {
+  transition-duration: 200ms;
+}
+.modal-component-enter > div:nth-child(2) {
+  transform: translate(-50%, -50%) scale(0.7) !important;
+  opacity: 0;
+}
+.modal-component-enter-active > div:nth-child(2) {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1;
+}
+.modal-component-exit > div:nth-child(2) {
+  transform: translate(-50%, -50%) scale(0.7) !important;
+  opacity: 1;
+}
+.modal-component-exit-active > div:nth-child(2) {
+  transform: translate(-50%, -50%) scale(0.9) !important;
+  opacity: 0;
+}
+
+.modal-component-exit-active > div:nth-child(1) {
+  opacity: 0;
+}
+.sidesheet-component > div:nth-child(2) {
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.sidesheet-component-enter > div:nth-child(2) {
+  transform: translate3d(100%, 0, 0);
+}
+.sidesheet-component-enter-active > div:nth-child(2) {
+  transform: translate3d(0, 0, 0);
+}
+
+.sidesheet-component-exit > div:nth-child(2) {
+  transform: translate3d(0, 0, 0);
+}
+.sidesheet-component-exit-active > div:nth-child(2) {
+  transform: translate3d(100%, 0, 0);
+}
+.sidesheet-component-exit-active > div:nth-child(1) {
+  opacity: 0;
+}

@@ -7,15 +7,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./constants/index.tsx";
 import { AppKitProvider } from "./providers/app_kit.tsx";
 import { Toaster } from "@/components/ui/sonner";
+import PopupHandler from "./lib/popup_handler/index.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AppKitProvider>
+    <AppKitProvider>
+      <QueryClientProvider client={queryClient}>
         <BrowserRouter basename="">
           <App />
           <Toaster />
+          <PopupHandler />
         </BrowserRouter>
-      </AppKitProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </AppKitProvider>
   </StrictMode>
 );
